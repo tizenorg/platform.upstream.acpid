@@ -973,7 +973,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dist_docDATA install-man
+install-data-am: install-man
 
 install-dvi: install-dvi-recursive
 
