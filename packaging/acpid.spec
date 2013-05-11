@@ -51,6 +51,7 @@ touch %{buildroot}%{_localstatedir}/log/acpid
 %docs_package
 
 %files
+%license COPYING
 %defattr(-,root,root)
 %dir %{_sysconfdir}/modprobe.d
 %dir %{_sysconfdir}/acpi
