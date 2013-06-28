@@ -12,6 +12,7 @@ Source9:        events.thinkpad
 Source6:        thinkpad_handler
 Source7:        power_button
 Source8:        acpid.service
+Source1001: 	acpid.manifest
 BuildRequires:  systemd
 ExclusiveArch:  %ix86 x86_64 ia64
 
@@ -25,6 +26,7 @@ Configure it in /etc/sysconfig/powermanagement.
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 cp %{SOURCE4} %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE9} .
 
@@ -51,6 +53,7 @@ touch %{buildroot}%{_localstatedir}/log/acpid
 %docs_package
 
 %files
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %dir %{_sysconfdir}/modprobe.d
 %dir %{_sysconfdir}/acpi
