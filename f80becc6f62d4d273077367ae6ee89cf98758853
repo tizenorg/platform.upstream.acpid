@@ -1,0 +1,8 @@
+Change-Id: If80becc6f62d4d273077367ae6ee89cf98758853
+Code-Review+2: Ryan Ware <ware@linux.intel.com>
+Verified+1: Ryan Ware <ware@linux.intel.com>
+Submitted-by: Ryan Ware <ware@linux.intel.com>
+Submitted-at: Mon, 08 Jul 2013 10:06:19 -0700
+Reviewed-on: https://review.tizen.org/gerrit/4591
+Project: platform/upstream/acpid
+Branch: refs/heads/tizen
