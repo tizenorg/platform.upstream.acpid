@@ -55,11 +55,18 @@ PMS="gnome-power-manager kpowersave xfce4-power-manager"
 PMS="$PMS guidance-power-manager.py dalston-power-applet"
 
 # If one of those is running or any of several others,
-if pidof x $PMS > /dev/null ||
-	( test "$XUSER" != "" && pidof dcopserver > /dev/null && test -x /usr/bin/dcop && /usr/bin/dcop --user $XUSER kded kded loadedModules | grep -q klaptopdaemon) ||
-	( test "$XUSER" != "" && test -x /usr/bin/qdbus && test -r /proc/$(pidof kded4)/environ && su - $XUSER -c "eval $(echo -n 'export '; cat /proc/$(pidof kded4)/environ |tr '\0' '\n'|grep DBUS_SESSION_BUS_ADDRESS); qdbus org.kde.kded" | grep -q powerdevil) ; then
-	# Get out as the power manager that is running will take care of things.
-    exit
+if pidof x $PMS > /dev/null; then
+        exit
+elif test "$XUSER" != "" && pidof dcopserver > /dev/null && test -x /usr/bin/dcop && /usr/bin/dcop --user $XUSER kded kded loadedModules | grep -q klaptopdaemon; then
+        exit
+elif test "$XUSER" != "" && test -x /usr/bin/qdbus; then
+        kded4pid=$(pgrep -n -u $XUSER kded4)
+        if test "$kded4pid" != ""; then
+                dbusaddr=$(su - $XUSER -c "grep -z DBUS_SESSION_BUS_ADDRESS /proc/$kded4pid/environ")
+                if test "$dbusaddr" != "" && su - $XUSER -c "export $dbusaddr; qdbus org.kde.kded" | grep -q powerdevil; then
+                        exit
+                fi
+        fi
 fi
 
 # No power managment system appears to be running.  Just initiate a plain 
