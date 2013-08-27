@@ -1,5 +1,5 @@
 Name:           acpid
-Version:        2.0.16
+Version:        2.0.19
 Release:        0
 License:        GPL-2.0+
 Summary:        Executes Actions at ACPI Events
@@ -12,7 +12,7 @@ Source9:        events.thinkpad
 Source6:        thinkpad_handler
 Source7:        power_button
 Source8:        acpid.service
-Source1001: 	acpid.manifest
+Source1001:     %{name}.manifest
 BuildRequires:  systemd
 ExclusiveArch:  %ix86 x86_64 ia64
 
