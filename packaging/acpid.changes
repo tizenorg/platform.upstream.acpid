@@ -1,0 +1,4 @@
+* Tue Aug 27 2013 Patrick McCarty <patrick.mccarty@linux.intel.com> 9094668
+- Update to version 2.0.19
+- Add patch to address CVE-2011-2777
+

@@ -1,10 +1,10 @@
 Name:           acpid
-Version:        2.0.16
+Version:        2.0.19
 Release:        0
 License:        GPL-2.0+
 Summary:        Executes Actions at ACPI Events
 Url:            http://tedfelix.com/linux/acpid-netlink.html
-Group:          System/Daemons
+Group:          System/Power Management
 Source:         http://tedfelix.com/linux/%{name}-%{version}.tar.gz
 Source4:        thinkpad_acpi.modprobe
 Source5:        events.power_button
@@ -12,7 +12,7 @@ Source9:        events.thinkpad
 Source6:        thinkpad_handler
 Source7:        power_button
 Source8:        acpid.service
-Source1001: 	acpid.manifest
+Source1001:     %{name}.manifest
 BuildRequires:  systemd
 ExclusiveArch:  %ix86 x86_64 ia64
 
@@ -32,7 +32,7 @@ cp %{SOURCE4} %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE9} .
 
 %build
 export LDFLAGS="-Wl,-z,relro,-z,now"
-%configure 
+%reconfigure
 make OPT="%{optflags}" %{?_smp_mflags}
 
 %install
@@ -49,12 +49,16 @@ install -m 644 %{SOURCE8} %{buildroot}/%{_unitdir}
 install -dm 755 %{buildroot}%{_localstatedir}/log
 touch %{buildroot}%{_localstatedir}/log/acpid
 
+# contains the README, TODO, etc., not the program documentation
+rm -rf %{buildroot}%{_datadir}/doc/acpid
+
 
 %docs_package
 
 %files
 %manifest %{name}.manifest
 %defattr(-,root,root)
+%license COPYING
 %dir %{_sysconfdir}/modprobe.d
 %dir %{_sysconfdir}/acpi
 %dir %{_sysconfdir}/acpi/events
