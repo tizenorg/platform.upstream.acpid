@@ -23,6 +23,9 @@
 #ifndef EVENT_H__
 #define EVENT_H__
 
+#define DROP_ACTION "<drop>"
+#define DROP_EVENT 1
+
 extern int acpid_read_conf(const char *confdir);
 extern int acpid_add_client(int client, const char *origin);
 extern int acpid_cleanup_rules(int do_detach);

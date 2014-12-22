@@ -63,8 +63,10 @@ struct rule_list {
 	struct rule *head;
 	struct rule *tail;
 };
-static struct rule_list cmd_list;
+
+static struct rule_list drop_list;
 static struct rule_list client_list;
+static struct rule_list cmd_list;
 
 /* rule routines */
 static void enlist_rule(struct rule_list *list, struct rule *r);
@@ -83,6 +85,8 @@ static int do_client_rule(struct rule *r, const char *event);
 static int safe_write(int fd, const char *buf, int len);
 static char *parse_cmd(const char *cmd, const char *event);
 static int check_escapes(const char *str);
+
+extern const char *dropaction;
 
 /*
  * read in all the configuration files
@@ -109,6 +113,7 @@ acpid_read_conf(const char *confdir)
 	/* Compile the regular expression.  This is based on run-parts(8). */
 	rc = regcomp(&preg, "^[a-zA-Z0-9_-]+$", RULE_REGEX_FLAGS);
 	if (rc) {
+		closedir(dir);
 		acpid_log(LOG_ERR, "regcomp(): %d", rc);
 		unlock_rules();
 		return -1;
@@ -129,6 +134,7 @@ acpid_read_conf(const char *confdir)
 
         if (asprintf(&file, "%s/%s", confdir, dirent->d_name) < 0) {
             acpid_log(LOG_ERR, "asprintf: %s", strerror(errno));
+            regfree(&preg);
             closedir(dir);
             unlock_rules();
             return -1;
@@ -165,18 +171,24 @@ acpid_read_conf(const char *confdir)
                 free(file);
                 /* ??? Too extreme?  Why not just continue? */
                 closedir(dir);
+                regfree(&preg);
                 unlock_rules();
                 return -1;
         }
         /* fd is closed by parse_file() */
 		r = parse_file(fd_rule, file);
 		if (r) {
-			enlist_rule(&cmd_list, r);
+			/* if this is a drop rule */
+			if (!strcmp(r->action.cmd, dropaction))
+				enlist_rule(&drop_list, r);
+			else
+				enlist_rule(&cmd_list, r);
 			nrules++;
 		}
 		free(file);
 	}
 
+    regfree(&preg);
 	closedir(dir);
 	unlock_rules();
 
@@ -217,6 +229,15 @@ acpid_cleanup_rules(int do_detach)
 	while (p) {
 		next = p->next;
 		delist_rule(&cmd_list, p);
+		free_rule(p);
+		p = next;
+	}
+
+	/* drop the drop rules */
+	p = drop_list.head;
+	while (p) {
+		next = p->next;
+		delist_rule(&drop_list, p);
 		free_rule(p);
 		p = next;
 	}
@@ -525,17 +546,17 @@ acpid_close_dead_clients(void)
 }
 
 /*
- * the main hook for propogating events
+ * the main hook for propagating events
  */
 int
 acpid_handle_event(const char *event)
 {
 	struct rule *p;
 	int nrules = 0;
-	struct rule_list *ar[] = { &client_list, &cmd_list, NULL };
+	struct rule_list *ar[] = { &drop_list, &client_list, &cmd_list, NULL };
 	struct rule_list **lp;
 
-	/* make an event be atomic wrt known signals */
+	/* make an event atomic wrt known signals */
 	lock_rules();
 
 	/* scan each rule list for any rules that care about this event */
@@ -554,7 +575,16 @@ acpid_handle_event(const char *event)
 				}
 				nrules++;
 				if (p->type == RULE_CMD) {
-					do_cmd_rule(p, event);
+					if (do_cmd_rule(p, event) == DROP_EVENT) {
+						/* Abort processing if event matches drop rule */
+						if (logevents)
+							acpid_log(LOG_INFO, "event dropped");
+						/* Skip the remaining rules. */
+						while (*++lp)
+							;
+						--lp;
+						break;
+					}
 				} else if (p->type == RULE_CLIENT) {
 					do_client_rule(p, event);
 				} else {
@@ -626,6 +656,9 @@ do_cmd_rule(struct rule *rule, const char *event)
 	pid_t pid;
 	int status;
 	const char *action;
+
+	if (!strcmp(rule->action.cmd, dropaction))
+		return DROP_EVENT;
 
 	pid = fork();
 	switch (pid) {

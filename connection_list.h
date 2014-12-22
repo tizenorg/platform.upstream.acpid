@@ -48,7 +48,7 @@ struct connection
 };
 
 /* add a connection to the list */
-extern void add_connection(struct connection *p);
+extern int add_connection(struct connection *p);
 
 /* delete a connection from the list */
 extern void delete_connection(int fd);
@@ -74,5 +74,8 @@ extern const fd_set *get_fdset(void);
 
 /* get the highest fd that was added to the list */
 extern int get_highestfd(void);
+
+/* delete all connections, closing the fds */
+extern void delete_all_connections(void);
 
 #endif /* CONNECTION_LIST_H__ */

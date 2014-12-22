@@ -35,9 +35,9 @@
 /*---------------------------------------------------------------*/
 /* private objects */
 
-#define MAX_CONNECTIONS 20
+static int capacity = 0;
 
-static struct connection connection_list[MAX_CONNECTIONS];
+static struct connection *connection_list = NULL;
 
 static int nconnections = 0;
 
@@ -51,16 +51,24 @@ static int highestfd = -2;
 /*---------------------------------------------------------------*/
 /* public functions */
 
-void
+int
 add_connection(struct connection *p)
 {
 	if (nconnections < 0)
-		return;
-	if (nconnections >= MAX_CONNECTIONS) {
-		acpid_log(LOG_ERR, "Too many connections.");
-		/* ??? This routine should return -1 in this situation so that */
-		/*   callers can clean up any open fds and whatnot.  */
-		return;
+		return -1;
+
+	/* if the list is full, allocate more space */
+	if (nconnections >= capacity) {
+		/* no more than 1024 */
+		if (capacity > 1024) {
+			acpid_log(LOG_ERR, "Too many connections.");
+			return -1;
+		}
+
+		/* another 20 */
+		capacity += 20;
+		connection_list =
+			realloc(connection_list, sizeof(struct connection) * capacity);
 	}
 
 	if (nconnections == 0)
@@ -73,6 +81,8 @@ add_connection(struct connection *p)
 	/* add to the fd set */
 	FD_SET(p->fd, &allfds);
 	highestfd = max(highestfd, p->fd);
+
+	return 0;
 }
 
 /*---------------------------------------------------------------*/
@@ -82,7 +92,9 @@ delete_connection(int fd)
 {
 	int i;
 
-	close(fd);
+	/* close anything other than stdin/stdout/stderr */
+	if (fd > 2)
+		close(fd);
 
 	/* remove from the fd set */
 	FD_CLR(fd, &allfds);
@@ -106,6 +118,21 @@ delete_connection(int fd)
 	for (i = 0; i < nconnections; ++i) {
 		highestfd = max(highestfd, connection_list[i].fd);
 	}
+}
+
+/*---------------------------------------------------------------*/
+
+void
+delete_all_connections(void)
+{
+	/* while there are still connections to delete */
+	while (nconnections) {
+		/* delete the connection at the end of the list */
+		delete_connection(connection_list[nconnections-1].fd);
+	}
+
+	free(connection_list);
+	connection_list = NULL;
 }
 
 /*---------------------------------------------------------------*/

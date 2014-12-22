@@ -56,53 +56,76 @@ struct evtab_entry {
    evtest.c, acpi_genl, or kacpimon to find new events to add to this
    table. */
 
+/*
+ * The two numbers (e.g. "00000080 00000000") in each string is a format
+ * that Xorg and maybe others expect.
+ *
+ * See hw/xfree86/os-support/linux/lnx_acpi.c in xserver and specifically
+ * lnxACPIGetEventFromOs().
+ */
+
 static struct evtab_entry evtab[] = {
+
+	/*** COMMON EVENTS ***/
+
 	{{{0,0}, EV_KEY, KEY_POWER, 1}, "button/power PBTN 00000080 00000000"},
 	{{{0,0}, EV_KEY, KEY_SUSPEND, 1}, 
  		"button/suspend SUSP 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_SLEEP, 1}, "button/sleep SBTN 00000080 00000000"},
 	{{{0,0}, EV_SW, SW_LID, 1}, "button/lid LID close"},
 	{{{0,0}, EV_SW, SW_LID, 0}, "button/lid LID open"},
-	/* blue access IBM button on Thinkpad T42p*/
-	{{{0,0}, EV_KEY, KEY_PROG1, 1}, "button/prog1 PROG1 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_VENDOR, 1}, "button/vendor VNDR 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_FN_F1, 1}, "button/fnf1 FNF1 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_FN_F2, 1}, "button/fnf2 FNF2 00000080 00000000"},
-	/* Fn-F2 produces KEY_BATTERY on Thinkpad T42p */
-	{{{0,0}, EV_KEY, KEY_BATTERY, 1}, 
- 		"button/battery BAT 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_SCREENLOCK, 1}, 
- 		"button/screenlock SCRNLCK 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_COFFEE, 1}, "button/coffee CFEE 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_SLEEP, 1}, "button/sleep SBTN 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_WLAN, 1}, "button/wlan WLAN 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_FN_F6, 1}, "button/fnf6 FNF6 00000080 00000000"},
+	{{{0,0}, EV_SW, SW_TABLET_MODE, 0}, "video/tabletmode TBLT 0000008A 00000000"},
+	{{{0,0}, EV_SW, SW_TABLET_MODE, 1}, "video/tabletmode TBLT 0000008A 00000001"},
+
+
+	/*** VIDEO ***/
+
+	{{{0,0}, EV_KEY, KEY_ZOOM, 1}, "button/zoom ZOOM 00000080 00000000"},
+	/* typical events file has "video.* 00000087" */
+	{{{0,0}, EV_KEY, KEY_BRIGHTNESSDOWN, 1},
+ 		"video/brightnessdown BRTDN 00000087 00000000"},
+ 	/* typical events file has "video.* 00000086" */
+	{{{0,0}, EV_KEY, KEY_BRIGHTNESSUP, 1},
+ 		"video/brightnessup BRTUP 00000086 00000000"},
+ 	/* additional events divined from the kernel's video.c */
+	{{{0,0}, EV_KEY, KEY_VIDEO_NEXT, 1},
+ 		"video/next NEXT 00000083 00000000"},
+	{{{0,0}, EV_KEY, KEY_VIDEO_PREV, 1},
+ 		"video/prev PREV 00000084 00000000"},
+	{{{0,0}, EV_KEY, KEY_BRIGHTNESS_CYCLE, 1},
+ 		"video/brightnesscycle BCYC 00000085 00000000"},
+	{{{0,0}, EV_KEY, KEY_BRIGHTNESS_ZERO, 1},
+ 		"video/brightnesszero BZRO 00000088 00000000"},
+	{{{0,0}, EV_KEY, KEY_DISPLAY_OFF, 1},
+			"video/displayoff DOFF 00000089 00000000"},
 	/* procfs on Thinkpad 600X reports "video VID0 00000080 00000000" */
 	/* typical events file has "video.* 00000080" */
-	{{{0,0}, EV_KEY, KEY_SWITCHVIDEOMODE, 1}, 
+	{{{0,0}, EV_KEY, KEY_SWITCHVIDEOMODE, 1},
 		"video/switchmode VMOD 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_FN_F9, 1}, "button/fnf9 FNF9 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_FN_F10, 1}, "button/fnf10 FF10 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_FN_F11, 1}, "button/fnf11 FF11 00000080 00000000"},
-	/* Fn-F9 produces KEY_F24 on Thinkpad T42p */
-	{{{0,0}, EV_KEY, KEY_F24, 1}, "button/f24 F24 00000080 00000000"},
 
-#if 0
-	/* These "EV_MSC, 4, x" events cause trouble.  They are triggered */
-	/* by unexpected keys on the keyboard.  */
-	/* The 4 is MSC_SCAN, so these are actually scan code events.  */
 
-	/* EV_MSC, MSC_SCAN, KEY_MINUS  This is triggered by the minus key. */
-	{{{0,0}, EV_MSC, 4, 12}, "button/fnbs FNBS 00000080 00000000"},
+ 	/*** AUDIO ***/
 
-	/* EV_MSC, MSC_SCAN, KEY_EQUAL  Triggered by the equals key. */
-	{{{0,0}, EV_MSC, 4, 13}, "button/fnins FNINS 00000080 00000000"},
+ 	{{{0,0}, EV_KEY, KEY_VOLUMEDOWN, 1},
+ 		"button/volumedown VOLDN 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_VOLUMEUP, 1},
+ 		"button/volumeup VOLUP 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_MUTE, 1},
+ 		"button/mute MUTE 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_MICMUTE, 1},
+		"button/micmute MICMUTE 00000080 00000000"},
+ 	/* cd play/pause buttons */
+ 	{{{0,0}, EV_KEY, KEY_NEXTSONG, 1},
+ 		"cd/next CDNEXT 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_PREVIOUSSONG, 1},
+ 		"cd/prev CDPREV 00000080 00000000"},
+ 	{{{0,0}, EV_KEY, KEY_PLAYPAUSE, 1},
+ 		"cd/play CDPLAY 00000080 00000000"},
+ 	{{{0,0}, EV_KEY, KEY_STOPCD, 1},
+ 		"cd/stop CDSTOP 00000080 00000000"},
 
-	/* EV_MSC, MSC_SCAN, KEY_BACKSPACE   Triggered by the backspace key. */
-	{{{0,0}, EV_MSC, 4, 14}, "button/fndel FNDEL 00000080 00000000"},
 
-	/* EV_MSC, MSC_SCAN, KEY_E   Triggered by the 'E' key. */
-	{{{0,0}, EV_MSC, 4, 18}, "button/fnpgdown FNPGDOWN 00000080 00000000"},
-#endif
+	/*** JACKS ***/
 
 /* This test probably belongs in configure.ac. */
 #ifdef SW_HEADPHONE_INSERT
@@ -133,42 +156,76 @@ static struct evtab_entry evtab[] = {
  #warning SW_HEADPHONE_INSERT not found in input_layer.h. Support for plug/unplug events will be disabled. Please upgrade your kernel headers to Linux-3.2 or newer.
 #endif
 
-	{{{0,0}, EV_KEY, KEY_ZOOM, 1}, "button/zoom ZOOM 00000080 00000000"},
-	/* typical events file has "video.* 00000087" */
-	{{{0,0}, EV_KEY, KEY_BRIGHTNESSDOWN, 1}, 
- 		"video/brightnessdown BRTDN 00000087 00000000"},
- 	/* typical events file has "video.* 00000086" */
-	{{{0,0}, EV_KEY, KEY_BRIGHTNESSUP, 1}, 
- 		"video/brightnessup BRTUP 00000086 00000000"},
-	{{{0,0}, EV_KEY, KEY_KBDILLUMTOGGLE, 1}, 
+
+ 	/*** MISCELLANEOUS ***/
+
+	/* blue access IBM button on Thinkpad T42p*/
+	{{{0,0}, EV_KEY, KEY_PROG1, 1}, "button/prog1 PROG1 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_VENDOR, 1}, "button/vendor VNDR 00000080 00000000"},
+	/* Fn-F2 produces KEY_BATTERY on Thinkpad T42p */
+	{{{0,0}, EV_KEY, KEY_BATTERY, 1},
+ 		"button/battery BAT 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_SCREENLOCK, 1},
+ 		"button/screenlock SCRNLCK 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_COFFEE, 1}, "button/coffee CFEE 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_WLAN, 1}, "button/wlan WLAN 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_FN_F1, 1}, "button/fnf1 FNF1 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_FN_F2, 1}, "button/fnf2 FNF2 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_FN_F6, 1}, "button/fnf6 FNF6 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_FN_F9, 1}, "button/fnf9 FNF9 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_FN_F10, 1}, "button/fnf10 FF10 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_FN_F11, 1}, "button/fnf11 FF11 00000080 00000000"},
+	/* F20 is sometimes used for micmute */
+	{{{0,0}, EV_KEY, KEY_F20, 1}, "button/f20 F20 00000080 00000000"},
+	/* Fn-F9 produces KEY_F24 on Thinkpad T42p */
+	{{{0,0}, EV_KEY, KEY_F24, 1}, "button/f24 F24 00000080 00000000"},
+	{{{0,0}, EV_KEY, KEY_KBDILLUMTOGGLE, 1},
  		"button/kbdillumtoggle KBILLUM 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_VOLUMEDOWN, 1}, 
- 		"button/volumedown VOLDN 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_VOLUMEUP, 1}, 
- 		"button/volumeup VOLUP 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_MUTE, 1}, 
- 		"button/mute MUTE 00000080 00000000"},
- 	/* cd play/pause buttons */
- 	{{{0,0}, EV_KEY, KEY_NEXTSONG, 1}, 
- 		"cd/next CDNEXT 00000080 00000000"},
-	{{{0,0}, EV_KEY, KEY_PREVIOUSSONG, 1}, 
- 		"cd/prev CDPREV 00000080 00000000"},
- 	{{{0,0}, EV_KEY, KEY_PLAYPAUSE, 1}, 
- 		"cd/play CDPLAY 00000080 00000000"},
- 	{{{0,0}, EV_KEY, KEY_STOPCD, 1}, 
- 		"cd/stop CDSTOP 00000080 00000000"},
- 	/* additional events divined from the kernel's video.c */
-	{{{0,0}, EV_KEY, KEY_VIDEO_NEXT, 1}, 
- 		"video/next NEXT 00000083 00000000"},
-	{{{0,0}, EV_KEY, KEY_VIDEO_PREV, 1}, 
- 		"video/prev PREV 00000084 00000000"},
-	{{{0,0}, EV_KEY, KEY_BRIGHTNESS_CYCLE, 1}, 
- 		"video/brightnesscycle BCYC 00000085 00000000"},
-	{{{0,0}, EV_KEY, KEY_BRIGHTNESS_ZERO, 1}, 
- 		"video/brightnesszero BZRO 00000088 00000000"},
-	{{{0,0}, EV_KEY, KEY_DISPLAY_OFF, 1}, 
-			"video/displayoff DOFF 00000089 00000000"}
+
+#if 0
+	/* These "EV_MSC, 4, x" events cause trouble.  They are triggered */
+	/* by unexpected keys on the keyboard.  */
+	/* The 4 is MSC_SCAN, so these are actually scan code events.  */
+ 	/* Apparently there is no KEY_FN_BS, etc..., defined in input.h. */
+
+	/* EV_MSC, MSC_SCAN, KEY_MINUS  This is triggered by the minus key. */
+	{{{0,0}, EV_MSC, 4, 12}, "button/fnbs FNBS 00000080 00000000"},
+
+	/* EV_MSC, MSC_SCAN, KEY_EQUAL  Triggered by the equals key. */
+	{{{0,0}, EV_MSC, 4, 13}, "button/fnins FNINS 00000080 00000000"},
+
+	/* EV_MSC, MSC_SCAN, KEY_BACKSPACE   Triggered by the backspace key. */
+	{{{0,0}, EV_MSC, 4, 14}, "button/fndel FNDEL 00000080 00000000"},
+
+	/* EV_MSC, MSC_SCAN, KEY_E   Triggered by the 'E' key. */
+	{{{0,0}, EV_MSC, 4, 18}, "button/fnpgdown FNPGDOWN 00000080 00000000"},
+#endif
+
 };
+
+/* special support for the MUTE key, as the key toggles we want to
+ * consider repeated keys but don't report them all the time. We just
+ * ensure that the number of key presses (MOD 2) is correct.
+ */
+static const char *
+mute_string(struct input_event event)
+{
+	if (event.type == EV_KEY && event.code == KEY_MUTE) {
+		static size_t repeat_count;
+		if (event.value == 1) {
+			repeat_count = 1;
+			return "button/mute MUTE (key pressed)";
+		} else if (event.value == 2) {
+			repeat_count++;
+			return NULL;
+		} else if (event.value == 0) {
+			if (repeat_count % 2 == 0) {
+				return "button/mute MUTE (key released)";
+			}
+		}
+	}
+	return NULL;
+}
 
 /*----------------------------------------------------------------------*/
 /* Given an input event, returns the string corresponding to that event.
@@ -268,7 +325,12 @@ static void process_input(int fd)
 	}
 	
 	/* convert the event into a string */
-	str = event_string(event);
+	if (tpmutefix) {
+		str = mute_string(event);
+		if (str ==  NULL)
+			str = event_string(event);
+	} else
+		str = event_string(event);
 	/* if this is not an event we care about, bail */
 	if (str == NULL)
 		return;
@@ -380,7 +442,14 @@ int open_inputfile(const char *filename)
 			strcpy(c.pathname, filename);
 		/* assume not a keyboard until we see a scancode */
 		c.kybd = 0;
-		add_connection(&c);
+
+		if (add_connection(&c) < 0) {
+			close(fd);
+			acpid_log(LOG_ERR,
+				"can't add connection for input layer %s (%s)",
+				filename, evname);
+			return -1;
+		}
 
 		return 0;  /* success */
 	}

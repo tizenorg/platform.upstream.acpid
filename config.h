@@ -10,11 +10,11 @@
 /* "Define if asprintf() exists" */
 #define HAVE_ASPRINTF 1
 
+/* "Define if chmod() exists" */
+#define HAVE_CHMOD 1
+
 /* Define to 1 if you have the `dup2' function. */
 #define HAVE_DUP2 1
-
-/* "Define if fchmod() exists" */
-#define HAVE_FCHMOD 1
 
 /* "Define if fchown() exists" */
 #define HAVE_FCHOWN 1
@@ -136,7 +136,7 @@
 #define PACKAGE_NAME "acpid"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "acpid 2.0.16"
+#define PACKAGE_STRING "acpid 2.0.22"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "acpid"
@@ -145,7 +145,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.0.16"
+#define PACKAGE_VERSION "2.0.22"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -173,10 +173,15 @@
 
 
 /* Version number of package */
-#define VERSION "2.0.16"
+#define VERSION "2.0.22"
+
+/* Enable large inode numbers on Mac OS X 10.5.  */
+#ifndef _DARWIN_USE_64_BIT_INODE
+# define _DARWIN_USE_64_BIT_INODE 1
+#endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-#define _FILE_OFFSET_BITS 64
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */

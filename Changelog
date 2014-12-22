@@ -1,3 +1,72 @@
+* Sat March 15 2014  Ted Felix <ted@tedfelix.com>
+  - 2.0.22 release
+    (configure.ac)  (Ted Felix)
+  - Add support for F20.  Debian Bug #738611.
+    (input_layer.c)  (Ted Felix)
+  - Fix for repeated mute keys on some ThinkPad models.
+    (acpid.c acpid.h input_layer.c)
+    (Torsten Hilbrich <torsten.hilbrich@secunet.com>)
+  - Add "-t" short option for "--tpmutefix".
+    (acpid.c)  (Ted Felix)
+  - Update man page for --tpmutefix.
+    (acpid.8)  (Ted Felix)
+
+* Wed Jan 15 2014  Ted Felix <ted@tedfelix.com>
+  - 2.0.21 release
+    (configure.ac)  (Ted Felix)
+  - Add new <drop> action.  Debian #732277.
+    (acpid.c event.h event.c acpid.8)
+    (Pigeon <pigeon@pigeonsnest.co.uk>, Ted Felix)
+
+* Sun Sep 15 2013  Ted Felix <ted -at- tedfelix -dot- com>
+  - 2.0.20 release
+    (configure.ac)  (Ted Felix)
+  - Improve build and release documentation.  
+    (README)  (Ted Felix)
+  - Fix for Debian bug #719659.  Improved handling of systems with
+    large numbers of input layer connections.  Better error handling.
+    (connection_list.h connection_list.c inotify_handler.c input_layer.c 
+    netlink.c proc.c sock.c acpid.c)  (Ted Felix, Ben Winslow)
+  - Update .gitignore for Eclipse.
+    (.gitignore)  (Ted Felix)
+
+* Tue May 28 2013  Ted Felix <ted -at- tedfelix -dot- com>
+  - 2.0.19 release
+    (configure.ac)  (Ted Felix)
+  - README improvements  (README)  (Ted Felix)
+  - man page additions  (acpid.8)  (Ted Felix)
+  - Sync kacpimon's libnetlink.c with acpid's.
+    (kacpimon/libnetlink.c)  (Ted Felix)
+  - Add support for mic mute (KEY_MICMUTE).
+    (input_layer.c)  (Ted Felix)
+
+* Fri Feb 15 2013  Ted Felix <http://www.tedfelix.com>
+  - 2.0.18 release
+    (configure.ac)  (Ted Felix)
+  - README improvements  (README)  (Ted Felix)
+  - Fix format of video/tabletmode event string.  CRITICAL.
+    (input_layer.c)  (Ted Felix)
+  - Add how to kill acpid to kacpimon man page.
+    (kacpimon.8)  (Ted Felix)
+  - Add info on logind.conf's HandlePowerKey to man page.
+    (acpid.8)  (Ted Felix)
+
+* Sat Sep 15 2012  Ted Felix <http://www.tedfelix.com>
+  - 2.0.17 release
+    (configure.ac)  (Ted Felix)
+  - Check for chmod.
+    (configure.ac)  (Ted Felix)
+  - Add support for tablet mode switch.  
+    (input_layer.c)  (Fabian Henze)
+  - Incorrect sizeof() usage for memset.  
+    (libnetlink.c)  (Auke Kok)
+  - Close some unclosed fd's.  
+    (acpid.c event.c ud_socket.c)  (Auke Kok)
+  - Do not create pid file when running in foreground.  
+    (acpid.c)  (Cristian Rodriguez)
+  - Free regular expression.  
+    (event.c)  (Cristian Rodriguez)
+
 * Thu Mar 29 2012  Ted Felix <http://www.tedfelix.com>
   - 2.0.16 release
     (configure.ac)  (Ted Felix)
