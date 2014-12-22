@@ -1,18 +1,18 @@
 Name:           acpid
-Version:        2.0.16
+Version:        2.0.22
 Release:        0
 License:        GPL-2.0+
 Summary:        Executes Actions at ACPI Events
-Url:            http://tedfelix.com/linux/acpid-netlink.html
-Group:          System/Daemons
-Source:         http://tedfelix.com/linux/%{name}-%{version}.tar.gz
+Url:            http://sourceforge.net/projects/acpid2
+Group:          Base/Hardware Adaptation
+Source:         http://sourceforge.net/projects/acpid2/files/%{name}-%{version}.tar.gz
 Source4:        thinkpad_acpi.modprobe
 Source5:        events.power_button
 Source9:        events.thinkpad
 Source6:        thinkpad_handler
 Source7:        power_button
 Source8:        acpid.service
-Source1001: 	acpid.manifest
+Source1001:     acpid.manifest
 BuildRequires:  systemd
 ExclusiveArch:  %ix86 x86_64 ia64
 
@@ -27,16 +27,15 @@ Configure it in /etc/sysconfig/powermanagement.
 %prep
 %setup -q
 cp %{SOURCE1001} .
-
 cp %{SOURCE4} %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE9} .
 
 %build
 export LDFLAGS="-Wl,-z,relro,-z,now"
 %configure 
-make OPT="%{optflags}" %{?_smp_mflags}
+%__make OPT="%{optflags}" %{?_smp_mflags}
 
 %install
-make install DESTDIR=%{buildroot} SBINDIR=%{_sbindir}
+%make_install SBINDIR=%{_sbindir}
 install -Dm 644 thinkpad_acpi.modprobe %{buildroot}%{_sysconfdir}/modprobe.d/50-thinkpad_acpi.conf
 install -Dm 744 thinkpad_handler %{buildroot}%{_prefix}/lib/acpid/thinkpad_handler
 install -Dm 744 power_button %{buildroot}%{_prefix}/lib/acpid/power_button
@@ -67,5 +66,3 @@ touch %{buildroot}%{_localstatedir}/log/acpid
 %{_sbindir}/acpid
 %{_bindir}/acpi_listen
 %ghost %config(noreplace,missingok) %{_localstatedir}/log/acpid
-
-%changelog
